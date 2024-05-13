@@ -41,3 +41,9 @@ class LoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Must include 'email' and 'password'.")
         return data
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'name', 'username', 'email', 'subscription_status', 'school', 'birth', 'sex']

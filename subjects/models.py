@@ -5,7 +5,7 @@ from users.models import CustomUser
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
     subject_name = models.CharField(max_length=128)
-    photo = models.ImageField(upload_to='images/', default='none.png')  # Добавлено дефолтное значение для картинки
+    photo = models.ImageField(upload_to='media/', default='none.png')
     description = models.TextField()
 
     def __str__(self):
@@ -13,18 +13,22 @@ class Subject(models.Model):
 
 class Topic(models.Model):
     id = models.AutoField(primary_key=True)
+    EASY = 'EASY'
+    MIDDLE = 'MIDDLE'
+    HARD = 'HARD'
+    ADVANCED = 'ADVANCED'
     SCALE = (
-        (0, _('EASY')),
-        (1, _('MIDDLE')),
-        (2, _('HARD')),
-        (3, _('Advanced'))
+        (EASY,'EASY'),
+        (MIDDLE, 'MIDDLE'),
+        (HARD, 'HARD'),
+        (ADVANCED, 'Advanced')
     )
 
     topic_name = models.CharField(max_length=128)
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='images/', default='none.png')  # Добавлено дефолтное значение для картинки
+    image = models.ImageField(upload_to='media/', default='none.png')
     description = models.TextField()
-    question_type = models.IntegerField(choices=SCALE, default=0, verbose_name=_("Difficulty"))
+    question_type = models.CharField(choices=SCALE, default=EASY, max_length=20, verbose_name=_("Difficulty"))
 
     def __str__(self):
         return self.topic_name
@@ -33,7 +37,7 @@ class Test(models.Model):
     id = models.AutoField(primary_key=True)
     test_name = models.CharField(max_length=255, default=_("New test"))
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    test_duration_minutes = models.TimeField(default='00:00:00')  # Добавлено дефолтное значение для времени
+    test_duration_minutes = models.TimeField(default='00:00:00')
 
     def __str__(self):
         return self.test_name
@@ -41,7 +45,7 @@ class Test(models.Model):
 class Question(models.Model):
     id = models.AutoField(primary_key=True)
     question_text = models.TextField()
-    image = models.ImageField(upload_to='images/', default='none.png')  # Добавлено дефолтное значение для картинки
+    image = models.ImageField(upload_to='media/', default='none.png')
     topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -57,7 +61,7 @@ class Answer(models.Model):
     question_id = models.ForeignKey(Question, related_name="answer", on_delete=models.CASCADE)
     answer_text = models.CharField(max_length=255, verbose_name=_("Answer Text"))
     is_correct = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='images/', default='none.png')  # Добавлено дефолтное значение для картинки
+    image = models.ImageField(upload_to='media/', default='none.png')
 
 class Result(models.Model):
     id = models.AutoField(primary_key=True)
@@ -67,6 +71,9 @@ class Result(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
     scheduled_end_time = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.id}'
 
 class ResultAnalysis(models.Model):
     id = models.AutoField(primary_key=True)
